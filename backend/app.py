@@ -19,7 +19,7 @@ def get_crimes():
     limit = int(request.args.get("limit", 500))
     borough = request.args.get("borough", None)
 
-    query = {"latitude": {"$exists": True}, "longitude": {"$exists": True}}
+    query = {"Latitude": {"$exists": True}, "Longitude": {"$exists": True}}
     if borough:
         query["boro_nm"] = borough.upper()
 
