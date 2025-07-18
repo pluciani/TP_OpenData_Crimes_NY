@@ -14,7 +14,7 @@ export default function CrimeHeatMap() {
   }, []);
 
   return (
-    <MapContainer center={[40.7128, -74.006]} zoom={11} style={{ height: "90vh", width: "50vw", mt: 2, mx: "auto" }}>
+    <MapContainer center={[40.7128, -74.006]} zoom={11} style={{ height: "80vh", width: "80vw", mt: 2, mx: "auto" }}>
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       <LeafletHeatmap points={heatData} />
     </MapContainer>
