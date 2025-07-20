@@ -16,7 +16,7 @@ collection = db["crimes"]
 
 @app.route("/crimes", methods=["GET"])
 def get_crimes():
-    limit = int(request.args.get("limit", 500))
+    limit = int(request.args.get("limit", 1000))
     borough = request.args.get("borough", None)
 
     query = {"Latitude": {"$exists": True}, "Longitude": {"$exists": True}}
