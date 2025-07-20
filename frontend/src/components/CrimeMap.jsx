@@ -5,7 +5,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { fetchCrimes } from "../api/fetchCrimes";
 
-// Fix des icônes Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
@@ -18,7 +17,7 @@ export default function CrimeMap() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCrimes(500).then(data => {
+    fetchCrimes().then(data => {
       setCrimes(data);
       setLoading(false);
     });

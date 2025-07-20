@@ -1,5 +1,7 @@
 import { Container, Typography } from "@mui/material";
-import CrimeMap from "./components/CrimeMap";
+import CrimeGridMap from "./components/CrimeGridMap";
+import CrimeHeatMap from "./components/CrimeHeatMap";
+
 
 function App() {
   return (
@@ -7,7 +9,7 @@ function App() {
       <Typography variant="h4" gutterBottom>
         Carte des crimes NYPD
       </Typography>
-      <CrimeMap />
+      <CrimeHeatMap />
     </Container>
   );
 }
