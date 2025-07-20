@@ -46,19 +46,24 @@ def crime_grid():
     results = list(collection.aggregate(pipeline))
     return jsonify(results)
 
+
 @app.route("/crime-heat")
 def crime_heat():
-    cursor = collection.find(
-        {
-            "Latitude": {"$ne": ""},
-            "Longitude": {"$ne": ""}
-        },
-        {
-            "_id": 0,
-            "Latitude": 1,
-            "Longitude": 1
-        }
-    )
+    crime_type = request.args.get("type")
+    query = {
+        "Latitude": {"$ne": ""},
+        "Longitude": {"$ne": ""}
+    }
+
+    if crime_type:
+        query["OFNS_DESC"] = crime_type
+
+    cursor = collection.find(query, {
+        "_id": 0,
+        "Latitude": 1,
+        "Longitude": 1
+    })
+
     points = []
     for doc in cursor:
         try:
@@ -69,6 +74,11 @@ def crime_heat():
             continue
     return jsonify(points)
 
+
+@app.route("/crime-types")
+def crime_types():
+    types = collection.distinct("OFNS_DESC")
+    return jsonify(sorted(filter(None, types)))
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

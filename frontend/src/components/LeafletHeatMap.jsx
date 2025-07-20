@@ -1,55 +1,48 @@
-import { useMap, useMapEvent } from "react-leaflet";
-import { useEffect, useState } from "react";
+import { useMap } from "react-leaflet";
+import { useEffect, useRef } from "react";
 import * as L from "leaflet";
 import "leaflet.heat";
 
 export default function LeafletHeatmap({ points }) {
   const map = useMap();
-  const [heatLayer, setHeatLayer] = useState(null);
-
-  const getDynamicMax = () => {
-    const zoom = map.getZoom();
-    if (zoom >= 15) return 3;
-    if (zoom >= 13) return 5;
-    if (zoom >= 11) return 8;
-    return 12;
-  };
-
-  const updateHeat = () => {
-    if (heatLayer) {
-      map.removeLayer(heatLayer);
-    }
-
-    const newLayer = L.heatLayer(points, {
-      radius: 20,
-      blur: 25,
-      maxZoom: 17,
-      max: getDynamicMax(),
-      gradient: {
-        0.1: "blue",
-        0.3: "lime",
-        0.5: "yellow",
-        0.7: "orange",
-        1.0: "red",
-      },
-    }).addTo(map);
-
-    setHeatLayer(newLayer);
-  };
+  const layerRef = useRef(null);
 
   useEffect(() => {
-    updateHeat();
+    if (layerRef.current) {
+      map.removeLayer(layerRef.current);
+    }
 
-    const handleZoom = () => {
-      updateHeat();
-    };
+    if (points && points.length > 0) {
+      const heatLayer = L.heatLayer(points, {
+        radius: 20,
+        blur: 25,
+        maxZoom: 17,
+        max: getDynamicMax(map.getZoom()),
+        gradient: {
+          0.1: "blue",
+          0.3: "lime",
+          0.5: "yellow",
+          0.7: "orange",
+          1.0: "red",
+        },
+      }).addTo(map);
 
-    map.on("zoomend", handleZoom);
+      layerRef.current = heatLayer;
+    }
+
     return () => {
-      map.off("zoomend", handleZoom);
-      if (heatLayer) map.removeLayer(heatLayer);
+      if (layerRef.current) {
+        map.removeLayer(layerRef.current);
+      }
     };
   }, [map, points]);
 
   return null;
+}
+
+function getDynamicMax(zoom) {
+  if (zoom >= 15) return 3;
+  if (zoom >= 13) return 5;
+  if (zoom >= 11) return 8;
+  return 12;
 }
