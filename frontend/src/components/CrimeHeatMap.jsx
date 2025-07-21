@@ -104,13 +104,12 @@ export default function CrimeHeatMap() {
         </Typography>
       </Box>
 
-      {/* Carte */}
       <MapContainer
         center={[40.7128, -74.006]}
         zoom={11}
         scrollWheelZoom={true}
         style={{
-          height: "90vh",
+          height: "70vh",
           width: "50vw",
           marginTop: "16px",
           marginLeft: "auto",
