@@ -3,6 +3,7 @@ from flask_cors import CORS
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 load_dotenv()
 
@@ -50,28 +51,59 @@ def crime_grid():
 @app.route("/crime-heat")
 def crime_heat():
     crime_type = request.args.get("type")
-    query = {
-        "Latitude": {"$ne": ""},
-        "Longitude": {"$ne": ""}
+    start_date = request.args.get("start_date")
+    end_date   = request.args.get("end_date") 
+
+    start = datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
+    end   = datetime.strptime(end_date,   "%Y-%m-%d") if end_date   else None
+
+    match_stage = {
+        "Latitude":   {"$ne": ""},
+        "Longitude":  {"$ne": ""}
     }
-
     if crime_type:
-        query["OFNS_DESC"] = crime_type
+        match_stage["OFNS_DESC"] = crime_type
 
-    cursor = collection.find(query, {
-        "_id": 0,
-        "Latitude": 1,
-        "Longitude": 1
+    pipeline = [
+        { "$match": match_stage },
+        {
+            "$addFields": {
+                "dateParsed": {
+                    "$dateFromString": {
+                        "dateString": "$CMPLNT_FR_DT",
+                        "format": "%m/%d/%Y"
+                    }
+                }
+            }
+        }
+    ]
+
+    if start and end:
+        pipeline.append({
+            "$match": {
+                "dateParsed": { "$gte": start, "$lte": end }
+            }
+        })
+
+    pipeline.append({
+        "$project": {
+            "_id": 0,
+            "Latitude":  1,
+            "Longitude": 1
+        }
     })
 
+    docs = collection.aggregate(pipeline)
+
     points = []
-    for doc in cursor:
+    for doc in docs:
         try:
             lat = float(doc["Latitude"])
             lon = float(doc["Longitude"])
             points.append([lat, lon, 1])
         except:
             continue
+
     return jsonify(points)
 
 
